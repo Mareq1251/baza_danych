@@ -3,62 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Esport Cloud Manager | Mareq1251</title>
+    <title>Esport Manager Pro | Mareq1251</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <div class="container">
+    <div id="login-overlay">
+        <div class="card login-card">
+            <h3>🔐 Logowanie do Systemu</h3>
+            <input type="text" id="login-user" placeholder="Login (admin / user)">
+            <input type="password" id="login-pass" placeholder="Hasło">
+            <button class="btn-full" onclick="handleLogin()">ZALOGUJ</button>
+            <p id="login-msg" style="color: #ff4d4d; font-size: 12px; margin-top: 10px;"></p>
+        </div>
+    </div>
+
+    <div class="container" id="main-content" style="display: none;">
         <h1>🎮 Esport Cloud Manager</h1>
 
-        <div class="card">
-            <h3>➕ Dodaj Zawodnika</h3>
-            <div class="grid-form">
-                <input type="number" id="gracz_id" placeholder="ID Gracza (np. 7)">
-                <input type="text" id="gracz_nick" placeholder="Pseudonim">
-                <input type="text" id="gracz_kraj" placeholder="Kraj">
-                <input type="number" id="gracz_rank" placeholder="Ranking">
-                <input type="number" id="user_id" placeholder="ID Użytkownika (1-5)">
-                <button class="btn-full" id="btn-add">WYŚLIJ DO BAZY</button>
-            </div>
+        <div class="card" id="admin-panel" style="display: none;">
+            <h3>➕ Dodaj nowy rekord do: <span id="current-table-name">Gracze</span></h3>
+            <div id="dynamic-form" class="grid-form">
+                </div>
+            <button class="btn-full" style="margin-top: 15px;" onclick="wyslijDane()">ZAPISZ W BAZIE</button>
         </div>
 
         <div class="card">
-            <h3>📊 Przeglądarka Tabel</h3>
+            <div class="header-flex">
+                <h3>📊 Przeglądarka Tabel</h3>
+                <button onclick="handleLogout()" class="btn-logout">Wyloguj</button>
+            </div>
             
-            <label for="table-select">Wybierz tabelę z bazy:</label>
+            <label>Wybierz główną tabelę:</label>
             <select id="table-select">
-                <option value="gracze">Gracze (Zawodnicy)</option>
+                <option value="gracze">Gracze</option>
+                <option value="druzyny">Drużyny</option>
                 <option value="gry">Gry</option>
-                <option value="druzyny">Drużyny (Zespoły)</option>
                 <option value="turnieje">Turnieje</option>
                 <option value="sponsorzy">Sponsorzy</option>
-                <option value="uzytkownicy">Użytkownicy Systemu</option>
-                <option value="mecze">Harmonogram Meczów</option>
-                <option value="uczestnicy_meczu">Statystyki w meczach</option>
-                <option value="nagrody">Nagrody i Pule</option>
-                <option value="wyniki_koncowe">Wyniki końcowe turniejów</option>
-                <option value="sklady_druzyn">Składy drużyn (Relacje)</option>
-                <option value="platformy">Platformy sprzętowe</option>
-                <option value="organizatorzy">Organizatorzy</option>
-                <option value="turniej_spons">Sponsoring turniejów</option>
-                <option value="rej_turniej">Rejestracje na turnieje</option>
+                <option value="uzytkownicy">Użytkownicy</option>
             </select>
 
-            <div id="status">Ładowanie...</div>
+            <div id="status">Baza online</div>
             
             <div class="table-container">
                 <table id="dynamic-table">
-                    <thead>
-                        <tr id="table-headers"></tr>
-                    </thead>
+                    <thead><tr id="table-headers"></tr></thead>
                     <tbody id="table-body"></tbody>
                 </table>
             </div>
         </div>
     </div>
 
-    <script src="script.js?v=5"></script>
+    <script src="script.js?v=final"></script>
 </body>
 </html>
