@@ -1,16 +1,15 @@
-// 1. Dane dostępowe
-const SB_URL = "https://cibbwjsixmkpyvhpjijk.supabase.co";
-const SB_KEY = "sb_publishable_PJHdt2Lx1Mj_wf7LZzf7AQ_4UdPSRLp";
+// Dane dostępowe - nie zmieniaj nazw tych stałych
+const MOJA_URL = "https://cibbwjsixmkpyvhpjijk.supabase.co";
+const MOJ_KLUCZ = "sb_publishable_PJHdt2Lx1Mj_wf7LZzf7AQ_4UdPSRLp";
 
-// 2. Inicjalizacja (używamy innej nazwy zmiennej - 'db')
-const db = window.supabase.createClient(SB_URL, SB_KEY);
+// Inicjalizacja pod nazwą 'mojeDane' zamiast 'supabase'
+const mojeDane = window.supabase.createClient(MOJA_URL, MOJ_KLUCZ);
 
-// 3. Pobieranie graczy z bazy
 async function pobierzGraczy() {
     const status = document.getElementById('status');
-    status.innerText = "Synchronizacja z bazą...";
+    status.innerText = "Synchronizacja...";
 
-    const { data, error } = await db
+    const { data, error } = await mojeDane
         .from('gracze')
         .select('*')
         .order('id_gracz', { ascending: true });
@@ -18,7 +17,7 @@ async function pobierzGraczy() {
     if (error) {
         status.innerText = "Błąd: " + error.message;
     } else {
-        status.innerText = "Baza online (Healthy)";
+        status.innerText = "Połączono!";
         const tbody = document.querySelector('#tabela-graczy tbody');
         tbody.innerHTML = data.map(g => `
             <tr>
@@ -31,7 +30,6 @@ async function pobierzGraczy() {
     }
 }
 
-// 4. Dodawanie nowego gracza
 async function dodajGracza() {
     const id = document.getElementById('gracz_id').value;
     const nick = document.getElementById('gracz_nick').value;
@@ -39,11 +37,11 @@ async function dodajGracza() {
     const rank = document.getElementById('gracz_rank').value;
 
     if (!id || !nick) {
-        alert("Wypełnij przynajmniej ID i Pseudonim!");
+        alert("Wypełnij ID i Pseudonim!");
         return;
     }
 
-    const { error } = await db.from('gracze').insert([
+    const { error } = await mojeDane.from('gracze').insert([
         { 
             id_gracz: parseInt(id), 
             pseudonim: nick, 
@@ -53,17 +51,15 @@ async function dodajGracza() {
     ]);
 
     if (error) {
-        alert("Błąd przy zapisie: " + error.message);
+        alert("Błąd: " + error.message);
     } else {
-        alert("Udało się! Dane są już w chmurze.");
-        document.getElementById('gracz_id').value = "";
-        document.getElementById('gracz_nick').value = "";
-        document.getElementById('gracz_kraj').value = "";
-        document.getElementById('gracz_rank').value = "";
+        alert("Dodano pomyślnie!");
         pobierzGraczy();
     }
 }
 
-// 5. Podpięcie przycisku i start
+// Podpięcie eventu
 document.getElementById('btn-add').addEventListener('click', dodajGracza);
+
+// Start
 pobierzGraczy();
