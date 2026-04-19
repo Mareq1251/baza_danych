@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Esport Cloud Manager | Mareq1251</title>
-    
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -17,10 +15,11 @@
         <div class="card">
             <h3>➕ Dodaj Zawodnika</h3>
             <div class="grid-form">
-                <input type="number" id="gracz_id" placeholder="ID Gracza">
+                <input type="number" id="gracz_id" placeholder="ID Gracza (np. 7)">
                 <input type="text" id="gracz_nick" placeholder="Pseudonim">
                 <input type="text" id="gracz_kraj" placeholder="Kraj">
                 <input type="number" id="gracz_rank" placeholder="Ranking">
+                <input type="number" id="user_id" placeholder="ID Użytkownika (1-5)">
                 <button class="btn-full" id="btn-add">WYŚLIJ DO BAZY</button>
             </div>
         </div>
@@ -36,7 +35,6 @@
                 <option value="turnieje">Turnieje</option>
                 <option value="sponsorzy">Sponsorzy</option>
                 <option value="uzytkownicy">Użytkownicy Systemu</option>
-                
                 <option value="mecze">Harmonogram Meczów</option>
                 <option value="uczestnicy_meczu">Statystyki w meczach</option>
                 <option value="nagrody">Nagrody i Pule</option>
@@ -55,13 +53,12 @@
                     <thead>
                         <tr id="table-headers"></tr>
                     </thead>
-                    <tbody id="table-body">
-                        </tbody>
+                    <tbody id="table-body"></tbody>
                 </table>
             </div>
         </div>
     </div>
 
-    <script src="script.js?v=4"></script>
+    <script src="script.js?v=5"></script>
 </body>
 </html>
