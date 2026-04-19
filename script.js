@@ -45,7 +45,6 @@ async function zaladujDane() {
     const { data, error } = await db.from(tableName).select('*');
     
     if (error) { 
-        console.error("Błąd pobierania:", error); 
         status.innerText = "Błąd: " + error.message;
         return; 
     }
@@ -53,14 +52,8 @@ async function zaladujDane() {
     status.innerText = `Baza online (Znaleziono: ${data.length} rekordów)`;
     renderujTabele(data);
     
-    // Generowanie panelu Admina
-    if (currentUserRole === 'admin') {
-        if (data.length > 0) {
-            generujFormularz(data[0]); // Formularz widzi pełne dane (w tym ID użytkownika)
-        } else {
-            document.getElementById('dynamic-form').innerHTML = 
-                "<p style='grid-column: span 2; color: #ff4d4d;'>Tabela jest pusta, więc system nie może zbudować formularza. Najpierw dodaj ręcznie 1 rekord w panelu Supabase.</p>";
-        }
+    if (currentUserRole === 'admin' && data.length > 0) {
+        generujFormularz(data[0]);
     }
 }
 
@@ -75,10 +68,9 @@ function renderujTabele(dane) {
     }
 
     const wszystkieKolumny = Object.keys(dane[0]);
-    // Filtracja: Ukrywamy techniczną kolumnę przed wzrokiem
-    const kolumnyDoWyswietlenia = wszystkieKolumny.filter(k => k !== 'uzytkownicy_id_uzytkownika');
+    // Filtracja: Ukrywamy techniczną kolumnę w tabeli
+    const kolumnyDoWyswietlenia = wszystkieKolumny.filter(k => k.toLowerCase() !== 'uzytkownicy_id_uzytkownika');
 
-    // Rysowanie nagłówków
     kolumnyDoWyswietlenia.forEach(k => {
         const th = document.createElement('th');
         th.innerText = k.replace(/_/g, ' ').toUpperCase();
@@ -86,17 +78,14 @@ function renderujTabele(dane) {
     });
     if (currentUserRole === 'admin') thead.innerHTML += "<th>AKCJE</th>";
 
-    // Rysowanie wierszy z danymi
     dane.forEach(wiersz => {
         const tr = document.createElement('tr');
-        
         kolumnyDoWyswietlenia.forEach(k => {
             tr.innerHTML += `<td>${wiersz[k] !== null ? wiersz[k] : '-'}</td>`;
         });
 
-        // Przycisk usuwania (tylko dla admina)
         if (currentUserRole === 'admin') {
-            const idCol = wszystkieKolumny[0]; // Bierzemy prawdziwe ID rekordu z pełnej listy
+            const idCol = wszystkieKolumny[0]; 
             const idVal = wiersz[idCol];
             tr.innerHTML += `<td><button class="btn-delete" onclick="usunRekord('${idCol}', '${idVal}')">USUŃ</button></td>`;
         }
@@ -104,11 +93,16 @@ function renderujTabele(dane) {
     });
 }
 
+// POPRAWKA: Pole znika z formularza
 function generujFormularz(wzor) {
     const form = document.getElementById('dynamic-form');
     form.innerHTML = "";
     Object.keys(wzor).forEach(k => {
-        form.innerHTML += `<input type="${typeof wzor[k] === 'number' ? 'number' : 'text'}" id="f-${k}" placeholder="${k.toUpperCase()}">`;
+        // Jeśli to pole relacji, nie twórz dla niego wejścia (Input)
+        if (k.toLowerCase() === 'uzytkownicy_id_uzytkownika') return;
+
+        let przyjaznaNazwa = k.replace(/_/g, ' ').toUpperCase();
+        form.innerHTML += `<input type="${typeof wzor[k] === 'number' ? 'number' : 'text'}" id="f-${k}" placeholder="${przyjaznaNazwa}">`;
     });
 }
 
@@ -122,6 +116,11 @@ async function wyslijDane() {
         const key = i.id.replace('f-', '');
         obj[key] = i.type === 'number' ? (i.value === "" ? null : parseInt(i.value)) : i.value;
     });
+
+    // POPRAWKA: Automatyczne dodawanie ID użytkownika w tle
+    if (tableName === 'gracze') {
+        obj['uzytkownicy_id_uzytkownika'] = 1; // Domyślnie przypisz do konta nr 1
+    }
 
     const { error } = await db.from(tableName).insert([obj]);
     if (error) alert("Błąd: " + error.message);
@@ -137,5 +136,4 @@ async function usunRekord(col, val) {
     }
 }
 
-// 6. Inicjalizacja
 document.getElementById('table-select').addEventListener('change', zaladujDane);
