@@ -1,11 +1,10 @@
-// 1. Dane dostępowe do Twojego projektu w chmurze
-const MOJA_URL = "https://cibbwjsixmkpyvhpjijk.supabase.co";
+// 1. Dane dostępowe - TUTAJ BYŁ BŁĄD (vhj zamiast vhp)
+const MOJA_URL = "https://cibbwjsixmkpyvhjpijk.supabase.co";
 const MOJ_KLUCZ = "sb_publishable_PJHdt2Lx1Mj_wf7LZzf7AQ_4UdPSRLp";
 
-// 2. Inicjalizacja połączenia (używamy unikalnej nazwy 'mojeDane')
+// 2. Inicjalizacja
 const mojeDane = window.supabase.createClient(MOJA_URL, MOJ_KLUCZ);
 
-// 3. Funkcja pobierająca listę graczy z bazy
 async function pobierzGraczy() {
     const statusLabel = document.getElementById('status');
     statusLabel.innerText = "Synchronizacja danych...";
@@ -16,74 +15,56 @@ async function pobierzGraczy() {
         .order('id_gracz', { ascending: true });
 
     if (error) {
-        statusLabel.innerText = "Błąd połączenia: " + error.message;
-        console.error("Błąd Supabase:", error);
+        statusLabel.innerText = "Błąd: " + error.message;
+        console.error(error);
     } else {
-        statusLabel.innerText = "Baza online (Healthy)";
+        statusLabel.innerText = "Połączono! Baza online";
         const tbody = document.querySelector('#tabela-graczy tbody');
-        
-        // Czyścimy tabelę przed załadowaniem nowych danych
-        tbody.innerHTML = "";
-
-        // Wstrzykujemy dane do tabeli
-        data.forEach(gracz => {
-            const row = `
-                <tr>
-                    <td>${gracz.id_gracz}</td>
-                    <td><strong>${gracz.pseudonim}</strong></td>
-                    <td>${gracz.kraj_pochodzenia || 'Brak danych'}</td>
-                    <td>${gracz.ranking_punktowy || 0} pkt</td>
-                </tr>
-            `;
-            tbody.innerHTML += row;
-        });
+        tbody.innerHTML = data.map(g => `
+            <tr>
+                <td>${g.id_gracz}</td>
+                <td><strong>${g.pseudonim}</strong></td>
+                <td>${g.kraj_pochodzenia}</td>
+                <td>${g.ranking_punktowy} pkt</td>
+            </tr>
+        `).join('');
     }
 }
 
-// 4. Funkcja dodająca nowego gracza
 async function dodajGracza() {
-    const idInput = document.getElementById('gracz_id').value;
-    const nickInput = document.getElementById('gracz_nick').value;
-    const krajInput = document.getElementById('gracz_kraj').value;
-    const rankInput = document.getElementById('gracz_rank').value;
+    const id = document.getElementById('gracz_id').value;
+    const nick = document.getElementById('gracz_nick').value;
+    const kraj = document.getElementById('gracz_kraj').value;
+    const rank = document.getElementById('gracz_rank').value;
 
-    // Walidacja pól
-    if (!idInput || !nickInput) {
-        alert("ID oraz Pseudonim są wymagane do rejestracji!");
+    if (!id || !nick) {
+        alert("Wypełnij ID i Pseudonim!");
         return;
     }
 
     const { error } = await mojeDane.from('gracze').insert([
         { 
-            id_gracz: parseInt(idInput), 
-            pseudonim: nickInput, 
-            kraj_pochodzenia: krajInput, 
-            ranking_punktowy: parseInt(rankInput) || 0 
+            id_gracz: parseInt(id), 
+            pseudonim: nick, 
+            kraj_pochodzenia: kraj, 
+            ranking_punktowy: parseInt(rank) || 0 
         }
     ]);
 
     if (error) {
-        alert("Błąd przy dodawaniu: " + error.message);
+        alert("Błąd: " + error.message);
     } else {
-        alert("Sukces! Gracz został zapisany w chmurze.");
-        
-        // Czyścimy pola formularza
+        alert("Dodano pomyślnie!");
         document.getElementById('gracz_id').value = "";
         document.getElementById('gracz_nick').value = "";
         document.getElementById('gracz_kraj').value = "";
         document.getElementById('gracz_rank').value = "";
-        
-        // Odświeżamy listę, aby zobaczyć nowego gracza
         pobierzGraczy();
     }
 }
 
-// 5. Podpięcie zdarzenia kliknięcia pod przycisk (z id 'btn-add')
-// Upewnij się, że w HTML przycisk ma id="btn-add" lub używamy onclick w HTML
-const submitBtn = document.getElementById('btn-add');
-if (submitBtn) {
-    submitBtn.addEventListener('click', dodajGracza);
-}
+// Podpięcie przycisku (id musi być btn-add)
+const btn = document.getElementById('btn-add');
+if(btn) btn.onclick = dodajGracza;
 
-// 6. Uruchomienie pobierania danych zaraz po załadowaniu strony
-document.addEventListener('DOMContentLoaded', pobierzGraczy);
+pobierzGraczy();
