@@ -7,6 +7,11 @@
     --danger: #ff4d4d;
 }
 
+/* FIX: Trzyma rozmiary elementów w ryzach */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
 body { 
     font-family: 'Segoe UI', sans-serif; 
     background: var(--bg); 
@@ -37,13 +42,25 @@ h3 { color: var(--main); border-bottom: 1px solid var(--border); padding-bottom:
     background: var(--bg); 
     display: flex; justify-content: center; align-items: center; 
     z-index: 1000; 
+    padding: 20px;
 }
-.login-card { width: 320px; text-align: center; }
+.login-card { 
+    width: 100%; 
+    max-width: 320px; 
+    text-align: center; 
+}
+
+/* FIX: Odstępy pod polami w logowaniu */
+.login-card input {
+    margin-bottom: 15px; 
+}
 
 .grid-form { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+
 input, select { 
     background: #0f172a; border: 1px solid var(--border); 
     padding: 12px; border-radius: 6px; color: white; font-size: 14px; 
+    width: 100%;
 }
 input:focus { border-color: var(--main); outline: none; }
 
@@ -60,10 +77,10 @@ input:focus { border-color: var(--main); outline: none; }
 }
 .header-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
 
-.table-container { overflow-x: auto; border-radius: 8px; }
-table { width: 100%; border-collapse: collapse; }
+.table-container { overflow-x: auto; border-radius: 8px; width: 100%; }
+/* Zapobiega zgniataniu tabeli na telefonach, wymusza scroll */
+table { width: 100%; border-collapse: collapse; min-width: 600px; }
 
-/* Nagłówki tabeli (przystosowane do sortowania) */
 th { 
     background: #334155; 
     color: var(--main); 
@@ -85,3 +102,13 @@ td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 13px; }
     font-size: 11px; font-weight: bold; transition: background 0.2s;
 }
 .btn-delete:hover { background: #cc0000; }
+
+/* FIX: Responsywność - dla ekranów mniejszych niż 768px (Smartfony) */
+@media (max-width: 768px) {
+    body { padding: 10px; }
+    .card { padding: 15px; }
+    .grid-form { grid-template-columns: 1fr; } /* Formularz zjeżdża w 1 kolumnę */
+    .header-flex { flex-direction: column; gap: 15px; align-items: stretch; }
+    .btn-logout { width: 100%; padding: 12px; font-size: 14px; }
+    h1 { font-size: 22px; }
+}
