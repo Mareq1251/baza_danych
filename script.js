@@ -1,16 +1,16 @@
-// Dane dostępowe z Twojego Supabase
+// 1. Dane dostępowe
 const SB_URL = "https://cibbwjsixmkpyvhpjijk.supabase.co";
 const SB_KEY = "sb_publishable_PJHdt2Lx1Mj_wf7LZzf7AQ_4UdPSRLp";
 
-// Inicjalizacja połączenia
-const supabase = lib.createClient(SB_URL, SB_KEY);
+// 2. Inicjalizacja (używamy innej nazwy zmiennej - 'db')
+const db = window.supabase.createClient(SB_URL, SB_KEY);
 
-// Pobieranie graczy z bazy
+// 3. Pobieranie graczy z bazy
 async function pobierzGraczy() {
     const status = document.getElementById('status');
     status.innerText = "Synchronizacja z bazą...";
 
-    const { data, error } = await supabase
+    const { data, error } = await db
         .from('gracze')
         .select('*')
         .order('id_gracz', { ascending: true });
@@ -31,7 +31,7 @@ async function pobierzGraczy() {
     }
 }
 
-// Dodawanie nowego gracza
+// 4. Dodawanie nowego gracza
 async function dodajGracza() {
     const id = document.getElementById('gracz_id').value;
     const nick = document.getElementById('gracz_nick').value;
@@ -43,7 +43,7 @@ async function dodajGracza() {
         return;
     }
 
-    const { error } = await supabase.from('gracze').insert([
+    const { error } = await db.from('gracze').insert([
         { 
             id_gracz: parseInt(id), 
             pseudonim: nick, 
@@ -56,18 +56,14 @@ async function dodajGracza() {
         alert("Błąd przy zapisie: " + error.message);
     } else {
         alert("Udało się! Dane są już w chmurze.");
-        // Czyścimy pola
         document.getElementById('gracz_id').value = "";
         document.getElementById('gracz_nick').value = "";
         document.getElementById('gracz_kraj').value = "";
         document.getElementById('gracz_rank').value = "";
-        // Odświeżamy tabelę
         pobierzGraczy();
     }
 }
 
-// Podpięcie przycisku do funkcji
+// 5. Podpięcie przycisku i start
 document.getElementById('btn-add').addEventListener('click', dodajGracza);
-
-// Pobierz dane na starcie
 pobierzGraczy();
