@@ -42,7 +42,6 @@ async function zaladujDane() {
     if (tableTitle) tableTitle.innerText = tableName.toUpperCase();
     status.innerText = `Pobieranie danych z: ${tableName}...`;
     
-    // TUTAJ BYŁ BŁĄD: Usunięto wadliwe .order(1), które blokowało skrypt
     const { data, error } = await db.from(tableName).select('*');
     
     if (error) { 
@@ -54,10 +53,10 @@ async function zaladujDane() {
     status.innerText = `Baza online (Znaleziono: ${data.length} rekordów)`;
     renderujTabele(data);
     
-    // Generowanie panelu Admina tylko, jeśli tabela nie jest całkowicie pusta
+    // Generowanie panelu Admina
     if (currentUserRole === 'admin') {
         if (data.length > 0) {
-            generujFormularz(data[0]);
+            generujFormularz(data[0]); // Formularz widzi pełne dane (w tym ID użytkownika)
         } else {
             document.getElementById('dynamic-form').innerHTML = 
                 "<p style='grid-column: span 2; color: #ff4d4d;'>Tabela jest pusta, więc system nie może zbudować formularza. Najpierw dodaj ręcznie 1 rekord w panelu Supabase.</p>";
@@ -75,16 +74,29 @@ function renderujTabele(dane) {
         return; 
     }
 
-    const kolumny = Object.keys(dane[0]);
-    kolumny.forEach(k => thead.innerHTML += `<th>${k.replace(/_/g, ' ')}</th>`);
+    const wszystkieKolumny = Object.keys(dane[0]);
+    // Filtracja: Ukrywamy techniczną kolumnę przed wzrokiem
+    const kolumnyDoWyswietlenia = wszystkieKolumny.filter(k => k !== 'uzytkownicy_id_uzytkownika');
+
+    // Rysowanie nagłówków
+    kolumnyDoWyswietlenia.forEach(k => {
+        const th = document.createElement('th');
+        th.innerText = k.replace(/_/g, ' ').toUpperCase();
+        thead.appendChild(th);
+    });
     if (currentUserRole === 'admin') thead.innerHTML += "<th>AKCJE</th>";
 
+    // Rysowanie wierszy z danymi
     dane.forEach(wiersz => {
         const tr = document.createElement('tr');
-        kolumny.forEach(k => tr.innerHTML += `<td>${wiersz[k] !== null ? wiersz[k] : '-'}</td>`);
+        
+        kolumnyDoWyswietlenia.forEach(k => {
+            tr.innerHTML += `<td>${wiersz[k] !== null ? wiersz[k] : '-'}</td>`;
+        });
 
+        // Przycisk usuwania (tylko dla admina)
         if (currentUserRole === 'admin') {
-            const idCol = kolumny[0]; 
+            const idCol = wszystkieKolumny[0]; // Bierzemy prawdziwe ID rekordu z pełnej listy
             const idVal = wiersz[idCol];
             tr.innerHTML += `<td><button class="btn-delete" onclick="usunRekord('${idCol}', '${idVal}')">USUŃ</button></td>`;
         }
