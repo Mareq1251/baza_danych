@@ -199,3 +199,10 @@ async function usunRekord(col, val) {
 }
 
 document.getElementById('table-select').addEventListener('change', zaladujDane);
+
+// --- NOWOŚĆ: Logowanie klawiszem Enter ---
+const wywolajLogowanieEnterem = (e) => {
+    if (e.key === 'Enter') handleLogin();
+};
+document.getElementById('login-user').addEventListener('keypress', wywolajLogowanieEnterem);
+document.getElementById('login-pass').addEventListener('keypress', wywolajLogowanieEnterem);
