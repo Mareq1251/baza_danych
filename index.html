@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Esport Manager Online | Mareq1251</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="container">
+        <h1>🎮 Esport Database System</h1>
+
+        <div class="card">
+            <h3>➕ Rejestracja Nowego Gracza</h3>
+            <div class="grid-form">
+                <input type="number" id="gracz_id" placeholder="ID Gracza">
+                <input type="text" id="gracz_nick" placeholder="Pseudonim">
+                <input type="text" id="gracz_kraj" placeholder="Kraj">
+                <input type="number" id="gracz_rank" placeholder="Ranking">
+                <button id="btn-add">DODAJ GRACZA DO BAZY</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>📊 Lista Zawodników</h3>
+            <div id="status">Ładowanie danych...</div>
+            <div style="overflow-x:auto;">
+                <table id="tabela-graczy">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Pseudonim</th>
+                            <th>Kraj</th>
+                            <th>Ranking</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
