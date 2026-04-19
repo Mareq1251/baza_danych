@@ -1,33 +1,26 @@
-// 1. Konfiguracja połączenia
+// 1. Konfiguracja Supabase
 const SB_URL = "https://cibbwjsixmkpyvhjpijk.supabase.co";
 const SB_KEY = "sb_publishable_PJHdt2Lx1Mj_wf7LZzf7AQ_4UdPSRLp";
 const db = window.supabase.createClient(SB_URL, SB_KEY);
 
-// 2. Dane logowania (zakodowane w Base64 dla dyskrecji)
-// admin / admin123
-const AUTH = {
-    u: "YWRtaW4=", 
-    p: "YWRtaW4xMjM="
-};
-
+// 2. Dane logowania (admin / admin123)
+const AUTH = { u: "YWRtaW4=", p: "YWRtaW4xMjM=" };
 let currentUserRole = 'user';
 
-// 3. Obsługa logowania
+// 3. System Logowania
 function handleLogin() {
     const user = document.getElementById('login-user').value;
     const pass = document.getElementById('login-pass').value;
     const msg = document.getElementById('login-msg');
 
     if (btoa(user) === AUTH.u && btoa(pass) === AUTH.p) {
-        // Zalogowano jako ADMIN
         currentUserRole = 'admin';
         wejdzDoSystemu(true);
     } else if (user === 'widz') {
-        // Zalogowano jako ZWYKŁY UŻYTKOWNIK (bez hasła)
         currentUserRole = 'user';
         wejdzDoSystemu(false);
     } else {
-        msg.innerText = "Błędne dane! Wejdź jako 'admin' lub 'widz'.";
+        msg.innerText = "Błąd! Admin wymaga hasła, widz nie.";
     }
 }
 
@@ -38,115 +31,74 @@ function wejdzDoSystemu(isAdmin) {
     zaladujDane();
 }
 
-function handleLogout() {
-    location.reload();
-}
+function handleLogout() { location.reload(); }
 
-// 4. Pobieranie danych i dynamiczna budowa interfejsu
+// 4. Zarządzanie danymi
 async function zaladujDane() {
     const tableName = document.getElementById('table-select').value;
-    const status = document.getElementById('status');
-    const tableTitle = document.getElementById('current-table-name');
+    document.getElementById('current-table-name').innerText = tableName.toUpperCase();
     
-    if (tableTitle) tableTitle.innerText = tableName.charAt(0).toUpperCase() + tableName.slice(1);
-    status.innerText = `Pobieranie danych z: ${tableName}...`;
+    const { data, error } = await db.from(tableName).select('*').order(1, {ascending: true});
+    if (error) { console.error(error); return; }
 
-    const { data, error } = await db.from(tableName).select('*');
-
-    if (error) {
-        status.innerText = "Błąd: " + error.message;
-        return;
-    }
-
-    status.innerText = "Status: Połączono";
     renderujTabele(data);
-    
-    // Generuj formularz tylko jeśli użytkownik jest adminem
-    if (currentUserRole === 'admin' && data.length > 0) {
-        generujFormularz(data[0]);
-    }
+    if (currentUserRole === 'admin' && data.length > 0) generujFormularz(data[0]);
 }
 
-// 5. Budowanie tabeli na podstawie dowolnych danych
 function renderujTabele(dane) {
     const thead = document.getElementById('table-headers');
     const tbody = document.getElementById('table-body');
-    
-    thead.innerHTML = "";
-    tbody.innerHTML = "";
-
-    if (!dane || dane.length === 0) {
-        tbody.innerHTML = "<tr><td colspan='100%'>Tabela jest pusta.</td></tr>";
-        return;
-    }
+    thead.innerHTML = ""; tbody.innerHTML = "";
+    if (!dane || dane.length === 0) { tbody.innerHTML = "<tr><td>Brak danych</td></tr>"; return; }
 
     const kolumny = Object.keys(dane[0]);
+    kolumny.forEach(k => thead.innerHTML += `<th>${k.replace(/_/g, ' ')}</th>`);
+    if (currentUserRole === 'admin') thead.innerHTML += "<th>AKCJE</th>";
 
-    // Nagłówki
-    kolumny.forEach(k => {
-        const th = document.createElement('th');
-        th.innerText = k.replace(/_/g, ' ').toUpperCase();
-        thead.appendChild(th);
-    });
-
-    // Wiersze
     dane.forEach(wiersz => {
         const tr = document.createElement('tr');
-        kolumny.forEach(k => {
-            const td = document.createElement('td');
-            td.innerText = wiersz[k] !== null ? wiersz[k] : '-';
-            tr.appendChild(td);
-        });
+        kolumny.forEach(k => tr.innerHTML += `<td>${wiersz[k] !== null ? wiersz[k] : '-'}</td>`);
+
+        if (currentUserRole === 'admin') {
+            const idCol = kolumny[0]; // Zakładamy że pierwsza kolumna to ID
+            const idVal = wiersz[idCol];
+            tr.innerHTML += `<td><button class="btn-delete" onclick="usunRekord('${idCol}', '${idVal}')">USUŃ</button></td>`;
+        }
         tbody.appendChild(tr);
     });
 }
 
-// 6. Automatyczne tworzenie pól formularza na podstawie kolumn tabeli
-function generujFormularz(wzorzec) {
-    const formContainer = document.getElementById('dynamic-form');
-    formContainer.innerHTML = "";
-
-    Object.keys(wzorzec).forEach(klucz => {
-        const input = document.createElement('input');
-        // Jeśli wartość jest liczbą, ustaw typ pola na number
-        input.type = typeof wzorzec[klucz] === 'number' ? 'number' : 'text';
-        input.id = `field-${klucz}`;
-        input.placeholder = klucz.replace(/_/g, ' ').toUpperCase();
-        formContainer.appendChild(input);
+function generujFormularz(wzor) {
+    const form = document.getElementById('dynamic-form');
+    form.innerHTML = "";
+    Object.keys(wzor).forEach(k => {
+        form.innerHTML += `<input type="${typeof wzor[k] === 'number' ? 'number' : 'text'}" id="f-${k}" placeholder="${k.toUpperCase()}">`;
     });
 }
 
-// 7. Uniwersalna funkcja wysyłania danych do wybranej tabeli
+// 5. Akcje: Dodawanie i Usuwanie
 async function wyslijDane() {
     const tableName = document.getElementById('table-select').value;
     const inputs = document.querySelectorAll('#dynamic-form input');
-    let nowyRekord = {};
-
-    inputs.forEach(input => {
-        const klucz = input.id.replace('field-', '');
-        let wartosc = input.value;
-
-        if (input.type === 'number') {
-            wartosc = wartosc === "" ? null : parseInt(wartosc);
-        } else {
-            wartosc = wartosc === "" ? null : wartosc;
-        }
-        
-        nowyRekord[klucz] = wartosc;
+    let obj = {};
+    inputs.forEach(i => {
+        const key = i.id.replace('f-', '');
+        obj[key] = i.type === 'number' ? (i.value === "" ? null : parseInt(i.value)) : i.value;
     });
 
-    const { error } = await db.from(tableName).insert([nowyRekord]);
+    const { error } = await db.from(tableName).insert([obj]);
+    if (error) alert("Błąd: " + error.message);
+    else { alert("Dodano rekord!"); zaladujDane(); }
+}
 
-    if (error) {
-        alert("Błąd zapisu: " + error.message);
-    } else {
-        alert("Pomyślnie dodano rekord do tabeli " + tableName);
-        zaladujDane(); // Odśwież widok
+async function usunRekord(col, val) {
+    const table = document.getElementById('table-select').value;
+    if (confirm(`UWAGA: Czy na pewno usunąć rekord gdzie ${col} = ${val}?`)) {
+        const { error } = await db.from(table).delete().eq(col, val);
+        if (error) alert("Błąd: " + error.message);
+        else { alert("Usunięto!"); zaladujDane(); }
     }
 }
 
-// 8. Eventy
+// 6. Inicjalizacja
 document.getElementById('table-select').addEventListener('change', zaladujDane);
-
-// Start
-console.log("System gotowy.");
