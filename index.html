@@ -30,12 +30,22 @@
             
             <label for="table-select">Wybierz tabelę z bazy:</label>
             <select id="table-select">
-                <option value="gracze">Gracze</option>
+                <option value="gracze">Gracze (Zawodnicy)</option>
                 <option value="gry">Gry</option>
-                <option value="druzyny">Drużyny</option>
+                <option value="druzyny">Drużyny (Zespoły)</option>
                 <option value="turnieje">Turnieje</option>
                 <option value="sponsorzy">Sponsorzy</option>
-                <option value="uzytkownicy">Użytkownicy</option>
+                <option value="uzytkownicy">Użytkownicy Systemu</option>
+                
+                <option value="mecze">Harmonogram Meczów</option>
+                <option value="uczestnicy_meczu">Statystyki w meczach</option>
+                <option value="nagrody">Nagrody i Pule</option>
+                <option value="wyniki_koncowe">Wyniki końcowe turniejów</option>
+                <option value="sklady_druzyn">Składy drużyn (Relacje)</option>
+                <option value="platformy">Platformy sprzętowe</option>
+                <option value="organizatorzy">Organizatorzy</option>
+                <option value="turniej_spons">Sponsoring turniejów</option>
+                <option value="rej_turniej">Rejestracje na turnieje</option>
             </select>
 
             <div id="status">Ładowanie...</div>
@@ -45,12 +55,13 @@
                     <thead>
                         <tr id="table-headers"></tr>
                     </thead>
-                    <tbody id="table-body"></tbody>
+                    <tbody id="table-body">
+                        </tbody>
                 </table>
             </div>
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <script src="script.js?v=4"></script>
 </body>
 </html>
