@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Esport Manager Pro | Mareq1251</title>
+    <title>Esport Cloud Manager | Mareq1251</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="style.css">
 </head>
@@ -12,8 +12,8 @@
     <div id="login-overlay">
         <div class="card login-card">
             <h3>🔐 Logowanie do Systemu</h3>
-            <input type="text" id="login-user" placeholder="Login (admin / user)">
-            <input type="password" id="login-pass" placeholder="Hasło">
+            <input type="text" id="login-user" placeholder="Login (admin / widz)">
+            <input type="password" id="login-pass" placeholder="Hasło (tylko dla admina)">
             <button class="btn-full" onclick="handleLogin()">ZALOGUJ</button>
             <p id="login-msg" style="color: #ff4d4d; font-size: 12px; margin-top: 10px;"></p>
         </div>
@@ -23,7 +23,7 @@
         <h1>🎮 Esport Cloud Manager</h1>
 
         <div class="card" id="admin-panel" style="display: none;">
-            <h3>➕ Dodaj nowy rekord do: <span id="current-table-name">Gracze</span></h3>
+            <h3>➕ Dodaj rekord do: <span id="current-table-name">Tabela</span></h3>
             <div id="dynamic-form" class="grid-form">
                 </div>
             <button class="btn-full" style="margin-top: 15px;" onclick="wyslijDane()">ZAPISZ W BAZIE</button>
@@ -35,7 +35,7 @@
                 <button onclick="handleLogout()" class="btn-logout">Wyloguj</button>
             </div>
             
-            <label>Wybierz główną tabelę:</label>
+            <label>Wybierz tabelę:</label>
             <select id="table-select">
                 <option value="gracze">Gracze</option>
                 <option value="druzyny">Drużyny</option>
@@ -43,6 +43,8 @@
                 <option value="turnieje">Turnieje</option>
                 <option value="sponsorzy">Sponsorzy</option>
                 <option value="uzytkownicy">Użytkownicy</option>
+                <option value="mecze">Mecze</option>
+                <option value="nagrody">Nagrody</option>
             </select>
 
             <div id="status">Baza online</div>
@@ -56,6 +58,6 @@
         </div>
     </div>
 
-    <script src="script.js?v=final"></script>
+    <script src="script.js?v=6"></script>
 </body>
 </html>
