@@ -3,9 +3,14 @@ const SB_URL = "https://cibbwjsixmkpyvhjpijk.supabase.co";
 const SB_KEY = "sb_publishable_PJHdt2Lx1Mj_wf7LZzf7AQ_4UdPSRLp";
 const db = window.supabase.createClient(SB_URL, SB_KEY);
 
-// 2. Dane logowania (admin / admin123)
+// 2. Dane logowania i stan aplikacji
 const AUTH = { u: "YWRtaW4=", p: "YWRtaW4xMjM=" };
 let currentUserRole = 'user';
+
+// Zmienne do sortowania
+let aktualneDane = []; 
+let aktualnaKolumna = ''; 
+let kierunekSortowania = 'asc'; 
 
 // 3. System Logowania
 function handleLogin() {
@@ -49,14 +54,58 @@ async function zaladujDane() {
         return; 
     }
 
+    // Reset sortowania przy zmianie tabeli
+    aktualnaKolumna = ''; 
+    kierunekSortowania = 'asc';
+    aktualneDane = data; 
+
     status.innerText = `Baza online (Znaleziono: ${data.length} rekordów)`;
-    renderujTabele(data);
     
-    if (currentUserRole === 'admin' && data.length > 0) {
-        generujFormularz(data[0]);
+    renderujTabele(aktualneDane);
+    
+    if (currentUserRole === 'admin') {
+        if (data.length > 0) {
+            generujFormularz(data[0]);
+        } else {
+            document.getElementById('dynamic-form').innerHTML = 
+                "<p style='grid-column: span 2; color: #ff4d4d;'>Tabela jest pusta. Dodaj pierwszy rekord ręcznie w bazie.</p>";
+        }
     }
 }
 
+// Logika Sortowania
+function sortuj(kolumna) {
+    if (!aktualneDane || aktualneDane.length === 0) return;
+
+    if (aktualnaKolumna === kolumna) {
+        kierunekSortowania = kierunekSortowania === 'asc' ? 'desc' : 'asc';
+    } else {
+        aktualnaKolumna = kolumna;
+        kierunekSortowania = 'asc';
+    }
+
+    aktualneDane.sort((a, b) => {
+        let valA = a[kolumna];
+        let valB = b[kolumna];
+
+        if (valA === null) return 1;
+        if (valB === null) return -1;
+
+        if (typeof valA === 'string') {
+            return kierunekSortowania === 'asc' 
+                ? valA.localeCompare(valB) 
+                : valB.localeCompare(valA);
+        } else {
+            return kierunekSortowania === 'asc' 
+                ? valA - valB 
+                : valB - valA;
+        }
+    });
+
+    renderujTabele(aktualneDane);
+}
+
+// Renderowanie tabeli
 function renderujTabele(dane) {
     const thead = document.getElementById('table-headers');
     const tbody = document.getElementById('table-body');
@@ -68,16 +117,31 @@ function renderujTabele(dane) {
     }
 
     const wszystkieKolumny = Object.keys(dane[0]);
-    // Filtracja: Ukrywamy techniczną kolumnę w tabeli
+    // Filtracja technicznej kolumny
     const kolumnyDoWyswietlenia = wszystkieKolumny.filter(k => k.toLowerCase() !== 'uzytkownicy_id_uzytkownika');
 
+    // Nagłówki
     kolumnyDoWyswietlenia.forEach(k => {
         const th = document.createElement('th');
-        th.innerText = k.replace(/_/g, ' ').toUpperCase();
+        let naglowekTekst = k.replace(/_/g, ' ').toUpperCase();
+
+        if (aktualnaKolumna === k) {
+            naglowekTekst += kierunekSortowania === 'asc' ? ' 🔼' : ' 🔽';
+        }
+
+        th.innerText = naglowekTekst;
+        th.title = "Kliknij, aby posortować";
+        th.onclick = () => sortuj(k);
         thead.appendChild(th);
     });
-    if (currentUserRole === 'admin') thead.innerHTML += "<th>AKCJE</th>";
 
+    if (currentUserRole === 'admin') {
+        const thAkcje = document.createElement('th');
+        thAkcje.innerText = "AKCJE";
+        thead.appendChild(thAkcje);
+    }
+
+    // Wiersze
     dane.forEach(wiersz => {
         const tr = document.createElement('tr');
         kolumnyDoWyswietlenia.forEach(k => {
@@ -93,14 +157,12 @@ function renderujTabele(dane) {
     });
 }
 
-// POPRAWKA: Pole znika z formularza
+// Generowanie formularza z ominięciem technicznego ID
 function generujFormularz(wzor) {
     const form = document.getElementById('dynamic-form');
     form.innerHTML = "";
     Object.keys(wzor).forEach(k => {
-        // Jeśli to pole relacji, nie twórz dla niego wejścia (Input)
         if (k.toLowerCase() === 'uzytkownicy_id_uzytkownika') return;
-
         let przyjaznaNazwa = k.replace(/_/g, ' ').toUpperCase();
         form.innerHTML += `<input type="${typeof wzor[k] === 'number' ? 'number' : 'text'}" id="f-${k}" placeholder="${przyjaznaNazwa}">`;
     });
@@ -117,9 +179,9 @@ async function wyslijDane() {
         obj[key] = i.type === 'number' ? (i.value === "" ? null : parseInt(i.value)) : i.value;
     });
 
-    // POPRAWKA: Automatyczne dodawanie ID użytkownika w tle
+    // Automatyczne przypisywanie relacji
     if (tableName === 'gracze') {
-        obj['uzytkownicy_id_uzytkownika'] = 1; // Domyślnie przypisz do konta nr 1
+        obj['uzytkownicy_id_uzytkownika'] = 1; 
     }
 
     const { error } = await db.from(tableName).insert([obj]);
