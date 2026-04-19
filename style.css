@@ -7,7 +7,7 @@
     --danger: #ff4d4d;
 }
 
-/* FIX: Trzyma rozmiary elementów w ryzach */
+/* Trzyma rozmiary elementów w ryzach */
 *, *::before, *::after {
     box-sizing: border-box;
 }
@@ -50,10 +50,7 @@ h3 { color: var(--main); border-bottom: 1px solid var(--border); padding-bottom:
     text-align: center; 
 }
 
-/* FIX: Odstępy pod polami w logowaniu */
-.login-card input {
-    margin-bottom: 15px; 
-}
+.login-card input { margin-bottom: 15px; }
 
 .grid-form { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
 
@@ -77,7 +74,18 @@ input:focus { border-color: var(--main); outline: none; }
 }
 .header-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
 
-.table-container { overflow-x: auto; border-radius: 8px; width: 100%; }
+/* FIX: Odstępy dla statusu i tabeli */
+#status {
+    margin-bottom: 15px;
+    font-size: 14px;
+}
+
+.table-container { 
+    overflow-x: auto; 
+    border-radius: 8px; 
+    width: 100%; 
+}
+
 /* Zapobiega zgniataniu tabeli na telefonach, wymusza scroll */
 table { width: 100%; border-collapse: collapse; min-width: 600px; }
 
@@ -103,11 +111,11 @@ td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 13px; }
 }
 .btn-delete:hover { background: #cc0000; }
 
-/* FIX: Responsywność - dla ekranów mniejszych niż 768px (Smartfony) */
+/* Responsywność - dla ekranów mniejszych niż 768px (Smartfony) */
 @media (max-width: 768px) {
     body { padding: 10px; }
     .card { padding: 15px; }
-    .grid-form { grid-template-columns: 1fr; } /* Formularz zjeżdża w 1 kolumnę */
+    .grid-form { grid-template-columns: 1fr; } 
     .header-flex { flex-direction: column; gap: 15px; align-items: stretch; }
     .btn-logout { width: 100%; padding: 12px; font-size: 14px; }
     h1 { font-size: 22px; }
