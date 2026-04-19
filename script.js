@@ -36,20 +36,44 @@ function handleLogout() { location.reload(); }
 // 4. Zarządzanie danymi
 async function zaladujDane() {
     const tableName = document.getElementById('table-select').value;
-    document.getElementById('current-table-name').innerText = tableName.toUpperCase();
+    const tableTitle = document.getElementById('current-table-name');
+    const status = document.getElementById('status');
     
-    const { data, error } = await db.from(tableName).select('*').order(1, {ascending: true});
-    if (error) { console.error(error); return; }
+    if (tableTitle) tableTitle.innerText = tableName.toUpperCase();
+    status.innerText = `Pobieranie danych z: ${tableName}...`;
+    
+    // TUTAJ BYŁ BŁĄD: Usunięto wadliwe .order(1), które blokowało skrypt
+    const { data, error } = await db.from(tableName).select('*');
+    
+    if (error) { 
+        console.error("Błąd pobierania:", error); 
+        status.innerText = "Błąd: " + error.message;
+        return; 
+    }
 
+    status.innerText = `Baza online (Znaleziono: ${data.length} rekordów)`;
     renderujTabele(data);
-    if (currentUserRole === 'admin' && data.length > 0) generujFormularz(data[0]);
+    
+    // Generowanie panelu Admina tylko, jeśli tabela nie jest całkowicie pusta
+    if (currentUserRole === 'admin') {
+        if (data.length > 0) {
+            generujFormularz(data[0]);
+        } else {
+            document.getElementById('dynamic-form').innerHTML = 
+                "<p style='grid-column: span 2; color: #ff4d4d;'>Tabela jest pusta, więc system nie może zbudować formularza. Najpierw dodaj ręcznie 1 rekord w panelu Supabase.</p>";
+        }
+    }
 }
 
 function renderujTabele(dane) {
     const thead = document.getElementById('table-headers');
     const tbody = document.getElementById('table-body');
     thead.innerHTML = ""; tbody.innerHTML = "";
-    if (!dane || dane.length === 0) { tbody.innerHTML = "<tr><td>Brak danych</td></tr>"; return; }
+    
+    if (!dane || dane.length === 0) { 
+        tbody.innerHTML = "<tr><td colspan='100%'>Brak danych w tej tabeli</td></tr>"; 
+        return; 
+    }
 
     const kolumny = Object.keys(dane[0]);
     kolumny.forEach(k => thead.innerHTML += `<th>${k.replace(/_/g, ' ')}</th>`);
@@ -60,7 +84,7 @@ function renderujTabele(dane) {
         kolumny.forEach(k => tr.innerHTML += `<td>${wiersz[k] !== null ? wiersz[k] : '-'}</td>`);
 
         if (currentUserRole === 'admin') {
-            const idCol = kolumny[0]; // Zakładamy że pierwsza kolumna to ID
+            const idCol = kolumny[0]; 
             const idVal = wiersz[idCol];
             tr.innerHTML += `<td><button class="btn-delete" onclick="usunRekord('${idCol}', '${idVal}')">USUŃ</button></td>`;
         }
@@ -81,6 +105,7 @@ async function wyslijDane() {
     const tableName = document.getElementById('table-select').value;
     const inputs = document.querySelectorAll('#dynamic-form input');
     let obj = {};
+    
     inputs.forEach(i => {
         const key = i.id.replace('f-', '');
         obj[key] = i.type === 'number' ? (i.value === "" ? null : parseInt(i.value)) : i.value;
