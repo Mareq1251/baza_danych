@@ -10,24 +10,13 @@ body {
     font-family: 'Segoe UI', sans-serif;
     background-color: var(--bg);
     color: var(--text);
-    margin: 0;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    margin: 0; padding: 20px;
+    display: flex; flex-direction: column; align-items: center;
 }
 
-.container {
-    width: 100%;
-    max-width: 1000px;
-}
+.container { width: 100%; max-width: 1000px; }
 
-h1 {
-    color: var(--main);
-    text-align: center;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-}
+h1 { color: var(--main); text-align: center; text-transform: uppercase; letter-spacing: 2px; }
 
 .card {
     background: var(--card);
@@ -35,26 +24,11 @@ h1 {
     border-radius: 12px;
     border: 1px solid var(--border);
     margin-bottom: 25px;
-    box-shadow: 0 10px 15px rgba(0,0,0,0.3);
-}
-
-h3 { color: var(--main); border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-top: 0; }
-
-label { display: block; margin-bottom: 8px; font-size: 14px; color: #94a3b8; }
-
-select {
-    background: #0f172a;
-    color: white;
-    padding: 12px;
-    border-radius: 8px;
-    border: 1px solid var(--border);
-    width: 100%;
-    cursor: pointer;
 }
 
 .grid-form { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
 
-input {
+input, select {
     background: #0f172a;
     border: 1px solid var(--border);
     padding: 12px;
@@ -73,9 +47,7 @@ input {
     cursor: pointer;
 }
 
-.table-container { overflow-x: auto; margin-top: 10px; }
-
-table { width: 100%; border-collapse: collapse; }
+table { width: 100%; border-collapse: collapse; margin-top: 20px; }
 
 th {
     background: #334155;
@@ -86,8 +58,8 @@ th {
     text-transform: uppercase;
 }
 
-td { padding: 15px; border-bottom: 1px solid var(--border); font-size: 14px; }
+td { padding: 15px; border-bottom: 1px solid var(--border); }
 
 tr:hover { background: rgba(62, 207, 142, 0.05); }
 
-#status { text-align: right; font-size: 12px; color: var(--main); margin-bottom: 5px; }
+#status { text-align: right; font-size: 12px; color: var(--main); }
