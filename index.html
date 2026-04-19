@@ -1,26 +1,56 @@
-<div class="card">
-    <h3>📊 Przeglądarka Tabel</h3>
-    <div style="margin-bottom: 15px;">
-        <label for="table-select" style="font-size: 14px; color: var(--main-color);">Wybierz tabelę:</label>
-        <select id="table-select" style="background: #0f172a; color: white; padding: 10px; border-radius: 6px; border: 1px solid var(--border); width: 100%; margin-top: 5px;">
-            <option value="gracze">Gracze</option>
-            <option value="gry">Gry</option>
-            <option value="druzyny">Drużyny</option>
-            <option value="turnieje">Turnieje</option>
-            <option value="sponsorzy">Sponsorzy</option>
-        </select>
-    </div>
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Esport Cloud Manager | Mareq1251</title>
     
-    <div id="status">Baza online</div>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
-    <div class="table-container">
-        <table id="dynamic-table">
-            <thead>
-                <tr id="table-headers">
-                    </tr>
-            </thead>
-            <tbody id="table-body">
-                </tbody>
-        </table>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="container">
+        <h1>🎮 Esport Cloud Manager</h1>
+
+        <div class="card">
+            <h3>➕ Dodaj Zawodnika</h3>
+            <div class="grid-form">
+                <input type="number" id="gracz_id" placeholder="ID Gracza">
+                <input type="text" id="gracz_nick" placeholder="Pseudonim">
+                <input type="text" id="gracz_kraj" placeholder="Kraj">
+                <input type="number" id="gracz_rank" placeholder="Ranking">
+                <button class="btn-full" id="btn-add">WYŚLIJ DO BAZY</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>📊 Przeglądarka Tabel</h3>
+            
+            <label for="table-select">Wybierz tabelę z bazy:</label>
+            <select id="table-select">
+                <option value="gracze">Gracze</option>
+                <option value="gry">Gry</option>
+                <option value="druzyny">Drużyny</option>
+                <option value="turnieje">Turnieje</option>
+                <option value="sponsorzy">Sponsorzy</option>
+                <option value="uzytkownicy">Użytkownicy</option>
+            </select>
+
+            <div id="status">Ładowanie...</div>
+            
+            <div class="table-container">
+                <table id="dynamic-table">
+                    <thead>
+                        <tr id="table-headers"></tr>
+                    </thead>
+                    <tbody id="table-body"></tbody>
+                </table>
+            </div>
+        </div>
     </div>
-</div>
+
+    <script src="script.js"></script>
+</body>
+</html>
