@@ -54,11 +54,24 @@ h3 { color: var(--main); border-bottom: 1px solid var(--border); padding-bottom:
 
 .grid-form { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
 
+/* FIX: Wygląd etykiety nad polem wyboru */
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
 input, select { 
     background: #0f172a; border: 1px solid var(--border); 
     padding: 12px; border-radius: 6px; color: white; font-size: 14px; 
     width: 100%;
 }
+
+/* FIX: Odstęp pod listą rozwijaną */
+#table-select {
+    margin-bottom: 20px;
+}
+
 input:focus { border-color: var(--main); outline: none; }
 
 .btn-full { 
@@ -74,10 +87,11 @@ input:focus { border-color: var(--main); outline: none; }
 }
 .header-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
 
-/* FIX: Odstępy dla statusu i tabeli */
+/* Odstępy dla statusu i tabeli */
 #status {
     margin-bottom: 15px;
     font-size: 14px;
+    color: #94a3b8; /* Lekko przygaszony kolor statusu dla lepszego wyglądu */
 }
 
 .table-container { 
